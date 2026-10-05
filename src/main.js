@@ -107,3 +107,15 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   renderApp();
   store.subscribe(renderApp);
 }
+
+// PWA Desktop / Mobile App Install Capture
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.__pwaInstallPrompt = e;
+});
+
+window.addEventListener('appinstalled', () => {
+  window.__pwaInstallPrompt = null;
+  store.showToast('Porulagam Desktop App installed successfully!', 'success');
+});
+

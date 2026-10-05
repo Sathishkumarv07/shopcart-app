@@ -7,10 +7,11 @@ class Store {
   constructor() {
     this.listeners = [];
     
-    // Load persisted cart and wishlist from localStorage if available
+    // Load persisted cart, wishlist, orders, and user from localStorage if available
     const savedCart = localStorage.getItem('porulagam_cart');
     const savedWishlist = localStorage.getItem('porulagam_wishlist');
     const savedOrders = localStorage.getItem('porulagam_orders');
+    const savedUser = localStorage.getItem('porulagam_user');
 
     this.state = {
       currentView: 'home', // home, categories, deals, orders, account, product_detail
@@ -38,15 +39,16 @@ class Store {
       ],
       wishlist: savedWishlist ? new Set(JSON.parse(savedWishlist)) : new Set(['prod-1', 'prod-2', 'prod-3', 'prod-4']),
       orders: savedOrders ? JSON.parse(savedOrders) : initialOrders,
-      user: {
-        name: 'Ananya Krishnan',
-        tamilName: 'அனன்யா கிருஷ்ணன்',
-        phone: '+91 98765 43210',
-        email: 'ananya.k@example.com',
-        avatar: 'https://lh3.googleusercontent.com/aida/AEtjO1VMK7LzmN11OfbTszqVMKU9MRwYeZaznwDllrDgq5bU9FagEjzWHPl7iE7IrMndkrNotBzyUF8XXPWwKS0MR6UhmUgiTsYdG2BfpHEmCWxAr93XRrvj5gimfh2qOy6m5iiMk0FzUml0NZALgeyvQolElc-M_OqYh6x6Qh_2anaqbSfmXrdet0iolaEUyERhlBGWR5vu-ByfwI5BqUvLkll9m0irF2Sjdc1DauDop15XMcbyF0i2DIaY-iw',
-        isLoggedIn: true,
-        superCoins: 240,
-        membershipTier: 'பொருளகம் Plus Gold'
+      user: savedUser ? JSON.parse(savedUser) : {
+        name: 'Guest User',
+        tamilName: 'விருந்தினர்',
+        phone: '',
+        email: '',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        isLoggedIn: false,
+        superCoins: 100,
+        membershipTier: 'Standard Member',
+        authProvider: null
       },
       pincode: '560001 - Bengaluru',
       lang: 'ta', // 'ta' for Tamil / 'en' for English
@@ -78,6 +80,7 @@ class Store {
       localStorage.setItem('porulagam_cart', JSON.stringify(this.state.cart));
       localStorage.setItem('porulagam_wishlist', JSON.stringify(Array.from(this.state.wishlist)));
       localStorage.setItem('porulagam_orders', JSON.stringify(this.state.orders));
+      localStorage.setItem('porulagam_user', JSON.stringify(this.state.user));
     } catch (e) {
       console.warn('LocalStorage save failed', e);
     }
@@ -299,24 +302,54 @@ class Store {
   }
 
   // User Auth
-  login(phone, name = 'Ananya Krishnan') {
+  loginWithGoogle(account = null) {
+    const defaultGoogleUser = {
+      name: 'Sathish Kumar',
+      tamilName: 'சதீஷ் குமார்',
+      phone: '+91 98401 23456',
+      email: 'sathish.kumar@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      isLoggedIn: true,
+      superCoins: 350,
+      membershipTier: 'பொருளகம் Plus Gold',
+      authProvider: 'google'
+    };
+
+    this.state.user = account ? { ...defaultGoogleUser, ...account, isLoggedIn: true, authProvider: 'google' } : defaultGoogleUser;
+    this.closeModal();
+    this.showToast(`Signed in with Google as ${this.state.user.name}!`, 'success');
+    this.notify();
+  }
+
+  login(phone, name = 'Ananya Krishnan', email = 'ananya.k@example.com') {
     this.state.user = {
       name,
       tamilName: 'அனன்யா கிருஷ்ணன்',
       phone: phone.startsWith('+91') ? phone : `+91 ${phone}`,
-      email: 'ananya.k@example.com',
-      avatar: 'https://lh3.googleusercontent.com/aida/AEtjO1VMK7LzmN11OfbTszqVMKU9MRwYeZaznwDllrDgq5bU9FagEjzWHPl7iE7IrMndkrNotBzyUF8XXPWwKS0MR6UhmUgiTsYdG2BfpHEmCWxAr93XRrvj5gimfh2qOy6m5iiMk0FzUml0NZALgeyvQolElc-M_OqYh6x6Qh_2anaqbSfmXrdet0iolaEUyERhlBGWR5vu-ByfwI5BqUvLkll9m0irF2Sjdc1DauDop15XMcbyF0i2DIaY-iw',
+      email: email,
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
       isLoggedIn: true,
       superCoins: 240,
-      membershipTier: 'பொருளகம் Plus Gold'
+      membershipTier: 'பொருளகம் Plus Gold',
+      authProvider: 'phone'
     };
     this.closeModal();
-    this.showToast('Logged in successfully!', 'success');
+    this.showToast(`Welcome back, ${name}! Logged in successfully.`, 'success');
     this.notify();
   }
 
   logout() {
-    this.state.user.isLoggedIn = false;
+    this.state.user = {
+      name: 'Guest User',
+      tamilName: 'விருந்தினர்',
+      phone: '',
+      email: '',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      isLoggedIn: false,
+      superCoins: 0,
+      membershipTier: 'Standard Member',
+      authProvider: null
+    };
     this.showToast('You have been logged out', 'info');
     this.notify();
   }
@@ -330,7 +363,16 @@ class Store {
   }
 
   setSearch(query) {
+    const trimmed = (query || '').trim();
     this.state.searchQuery = query;
+    if (trimmed !== '' && this.state.currentView !== 'home') {
+      this.state.currentView = 'home';
+    }
+    this.notify();
+  }
+
+  clearSearch() {
+    this.state.searchQuery = '';
     this.notify();
   }
 }

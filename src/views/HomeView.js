@@ -19,91 +19,118 @@ export function renderHomeView(container) {
     );
   }
 
+  const isSearching = state.searchQuery && state.searchQuery.trim() !== '';
+
   container.innerHTML = `
     <div class="flex flex-col w-full pb-10 space-y-4">
       
-      <!-- Bank / Payment Offers Ticker Strip -->
-      <div class="px-4 sm:px-6">
-        <div class="bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high p-3 rounded-2xl flex items-center justify-between shadow-xs border border-outline-variant/30">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-              <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
-            </div>
-            <div class="flex flex-col min-w-0">
-              <p class="font-label-md text-label-md text-on-surface font-bold truncate">
-                ${isTamil ? 'உடனடி 10% கேஷ்பேக் ஆஃபர்' : 'Flat 10% Instant Bank Cashback'}
-              </p>
-              <p class="font-body-sm text-[11px] text-on-surface-variant truncate">
-                ${isTamil ? 'HDFC, ICICI & SBI கார்டுகளுக்கு | குறைந்தபட்சம் ₹4,999' : 'On HDFC, ICICI & SBI Bank Cards | Min ₹4,999'}
-              </p>
-            </div>
-          </div>
-          <button id="claim-bank-offer-btn" class="shrink-0 px-3.5 py-1.5 bg-primary text-on-primary rounded-xl font-label-sm text-[11px] font-bold hover:bg-primary-container transition-all active:scale-95 shadow-sm">
-            ${isTamil ? 'பெறுக' : 'Claim'}
-          </button>
-        </div>
-      </div>
-
-      <!-- Horizontal Circular Category Nav -->
-      <section class="w-full">
-        <div class="flex overflow-x-auto gap-4 sm:gap-6 px-4 sm:px-6 py-2 no-scrollbar scroll-smooth">
-          ${categories.map(cat => `
-            <button 
-              data-cat-nav="${cat.id}"
-              class="flex flex-col items-center gap-1.5 shrink-0 group focus:outline-none"
-            >
-              <div class="w-14 h-14 rounded-full ${cat.colorClass} flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                <span class="material-symbols-outlined text-[26px]">${cat.icon}</span>
+      ${isSearching ? `
+        <!-- Search Results Header Strip -->
+        <section class="px-4 sm:px-6 pt-1">
+          <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <span class="material-symbols-outlined text-[24px]">search</span>
               </div>
-              <span class="font-label-sm text-[12px] text-on-surface font-semibold text-center group-hover:text-primary transition-colors">
-                ${isTamil ? cat.tamilName : cat.name}
-              </span>
+              <div class="min-w-0">
+                <h2 class="font-headline-sm text-base sm:text-lg font-bold text-on-surface truncate">
+                  ${isTamil ? `"${state.searchQuery}" - க்கான தேடல் முடிவுகள்` : `Search results for "${state.searchQuery}"`}
+                </h2>
+                <p class="font-body-sm text-[12px] text-on-surface-variant">
+                  ${displayProducts.length} ${isTamil ? 'பொருட்கள் கிடைக்கின்றன' : 'products found in catalog'}
+                </p>
+              </div>
+            </div>
+            <button id="clear-search-filter-btn" class="px-3.5 py-2 rounded-xl border border-outline-variant/50 hover:bg-surface-container text-on-surface font-label-sm text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">close</span>
+              <span>${isTamil ? 'அகற்று' : 'Clear Search'}</span>
             </button>
-          `).join('')}
-        </div>
-      </section>
-
-      <!-- Hero Promotional Carousel Banner -->
-      <section class="px-4 sm:px-6">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed text-on-primary shadow-lg p-5 sm:p-8">
-          <!-- Glow effects -->
-          <div class="absolute -right-8 -top-8 w-44 h-44 bg-inverse-primary/25 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-secondary-fixed/20 rounded-full blur-xl pointer-events-none"></div>
-          
-          <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex flex-col gap-2 max-w-lg">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full bg-on-primary/20 backdrop-blur-md text-on-primary font-label-sm text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-ping"></span>
-                  ${isTamil ? 'வரையறுக்கப்பட்ட சலுகை' : 'Limited Time Super Drop'}
-                </span>
-                <span class="text-secondary-fixed font-mono text-[12px] font-bold" id="hero-timer">04h : 22m : 18s</span>
+          </div>
+        </section>
+      ` : `
+        <!-- Bank / Payment Offers Ticker Strip -->
+        <div class="px-4 sm:px-6">
+          <div class="bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high p-3 rounded-2xl flex items-center justify-between shadow-xs border border-outline-variant/30">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
               </div>
-              <h2 class="font-display-hero text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-                ${isTamil ? 'மின்னணுவியல் பெருந்தள்ளுபடி' : 'Electronics & Gadgets Mega Drop'}
-              </h2>
-              <p class="font-body-md text-body-md text-primary-fixed leading-relaxed">
-                ${isTamil ? 'ஸ்மார்ட்போன்கள் மற்றும் ஹெட்போன்களுக்கு 70% வரை தள்ளுபடி. கூடுதல் எக்ஸ்சேஞ்ச் போனஸ்!' : 'Up to 70% off on flagship smartphones, active noise cancellation buds & M2 iPads.'}
-              </p>
-              <div class="flex items-center gap-3 pt-2">
-                <button id="hero-shop-now-btn" class="px-5 py-2.5 rounded-xl bg-white text-primary font-label-md text-label-md font-extrabold hover:bg-surface-container-low transition-all active:scale-95 shadow-md">
-                  ${isTamil ? 'இப்போதே வாங்குங்கள்' : 'Shop Flagships'}
-                </button>
-                <span class="font-label-sm text-[12px] text-white/80">No Cost EMI from ₹1,499/mo</span>
+              <div class="flex flex-col min-w-0">
+                <p class="font-label-md text-label-md text-on-surface font-bold truncate">
+                  ${isTamil ? 'உடனடி 10% கேஷ்பேக் ஆஃபர்' : 'Flat 10% Instant Bank Cashback'}
+                </p>
+                <p class="font-body-sm text-[11px] text-on-surface-variant truncate">
+                  ${isTamil ? 'HDFC, ICICI & SBI கார்டுகளுக்கு | குறைந்தபட்சம் ₹4,999' : 'On HDFC, ICICI & SBI Bank Cards | Min ₹4,999'}
+                </p>
               </div>
             </div>
+            <button id="claim-bank-offer-btn" class="shrink-0 px-3.5 py-1.5 bg-primary text-on-primary rounded-xl font-label-sm text-[11px] font-bold hover:bg-primary-container transition-all active:scale-95 shadow-sm cursor-pointer">
+              ${isTamil ? 'பெறுக' : 'Claim'}
+            </button>
+          </div>
+        </div>
 
-            <!-- Hero graphic / badge -->
-            <div class="relative shrink-0 hidden sm:flex items-center justify-center">
-              <div class="w-32 h-32 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-3 flex flex-col items-center justify-center text-center shadow-inner">
-                <span class="material-symbols-outlined text-[42px] text-secondary-fixed">bolt</span>
-                <span class="font-price-lg text-xl font-black text-white mt-1">UP TO 70%</span>
-                <span class="font-label-sm text-[10px] uppercase text-white/90 font-bold">DISCOUNT</span>
+        <!-- Horizontal Circular Category Nav -->
+        <section class="w-full">
+          <div class="flex overflow-x-auto gap-4 sm:gap-6 px-4 sm:px-6 py-2 no-scrollbar scroll-smooth">
+            ${categories.map(cat => `
+              <button 
+                data-cat-nav="${cat.id}"
+                class="flex flex-col items-center gap-1.5 shrink-0 group focus:outline-none cursor-pointer"
+              >
+                <div class="w-14 h-14 rounded-full ${cat.colorClass} flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <span class="material-symbols-outlined text-[26px]">${cat.icon}</span>
+                </div>
+                <span class="font-label-sm text-[12px] text-on-surface font-semibold text-center group-hover:text-primary transition-colors">
+                  ${isTamil ? cat.tamilName : cat.name}
+                </span>
+              </button>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- Hero Promotional Carousel Banner -->
+        <section class="px-4 sm:px-6">
+          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed text-on-primary shadow-lg p-5 sm:p-8">
+            <!-- Glow effects -->
+            <div class="absolute -right-8 -top-8 w-44 h-44 bg-inverse-primary/25 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-secondary-fixed/20 rounded-full blur-xl pointer-events-none"></div>
+            
+            <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex flex-col gap-2 max-w-lg">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full bg-on-primary/20 backdrop-blur-md text-on-primary font-label-sm text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-ping"></span>
+                    ${isTamil ? 'வரையறுக்கப்பட்ட சலுகை' : 'Limited Time Super Drop'}
+                  </span>
+                  <span class="text-secondary-fixed font-mono text-[12px] font-bold" id="hero-timer">04h : 22m : 18s</span>
+                </div>
+                <h2 class="font-display-hero text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+                  ${isTamil ? 'மின்னணுவியல் பெருந்தள்ளுபடி' : 'Electronics & Gadgets Mega Drop'}
+                </h2>
+                <p class="font-body-md text-body-md text-primary-fixed leading-relaxed">
+                  ${isTamil ? 'ஸ்மார்ட்போன்கள் மற்றும் ஹெட்போன்களுக்கு 70% வரை தள்ளுபடி. கூடுதல் எக்ஸ்சேஞ்ச் போனஸ்!' : 'Up to 70% off on flagship smartphones, active noise cancellation buds & M2 iPads.'}
+                </p>
+                <div class="flex items-center gap-3 pt-2">
+                  <button id="hero-shop-now-btn" class="px-5 py-2.5 rounded-xl bg-white text-primary font-label-md text-label-md font-extrabold hover:bg-surface-container-low transition-all active:scale-95 shadow-md cursor-pointer">
+                    ${isTamil ? 'இப்போதே வாங்குங்கள்' : 'Shop Flagships'}
+                  </button>
+                  <span class="font-label-sm text-[12px] text-white/80">No Cost EMI from ₹1,499/mo</span>
+                </div>
+              </div>
+
+              <!-- Hero graphic / badge -->
+              <div class="relative shrink-0 hidden sm:flex items-center justify-center">
+                <div class="w-32 h-32 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-3 flex flex-col items-center justify-center text-center shadow-inner">
+                  <span class="material-symbols-outlined text-[42px] text-secondary-fixed">bolt</span>
+                  <span class="font-price-lg text-xl font-black text-white mt-1">UP TO 70%</span>
+                  <span class="font-label-sm text-[10px] uppercase text-white/90 font-bold">DISCOUNT</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      `}
 
       <!-- Today's Super Drops / Flash Deals -->
       <section class="px-4 sm:px-6 pt-2">
@@ -111,14 +138,42 @@ export function renderHomeView(container) {
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-error text-[24px]">local_fire_department</span>
             <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-              ${isTamil ? 'இன்றைய சூப்பர் சலுகைகள்' : "Today's Super Drops"}
+              ${isSearching ? (isTamil ? 'பொருந்திய பொருட்கள்' : 'Matching Products') : (isTamil ? 'இன்றைய சூப்பர் சலுகைகள்' : "Today's Super Drops")}
             </h3>
           </div>
-          <button id="view-all-deals-btn" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5">
-            ${isTamil ? 'அனைத்தும் காண்க' : 'View All'}
-            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-          </button>
+          ${!isSearching ? `
+            <button id="view-all-deals-btn" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'அனைத்தும் காண்க' : 'View All'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          ` : ''}
         </div>
+
+        ${displayProducts.length === 0 ? `
+          <!-- No Results State -->
+          <div class="py-12 px-4 rounded-2xl bg-surface-container-lowest border border-surface-container flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline mb-3">
+              <span class="material-symbols-outlined text-[36px]">search_off</span>
+            </div>
+            <h4 class="font-headline-sm text-lg font-bold text-on-surface mb-1">
+              ${isTamil ? 'பொருட்கள் எதுவும் கிடைக்கவில்லை' : 'No products found'}
+            </h4>
+            <p class="font-body-sm text-sm text-on-surface-variant max-w-sm mb-5">
+              ${isTamil ? `"${state.searchQuery}" என்ற தேடலுக்கு முடிவுகள் இல்லை. கீழே உள்ள பரிந்துரைகளைப் பார்க்கவும்.` : `We couldn't find any products matching "${state.searchQuery}". Try searching for one of the popular categories below:`}
+            </p>
+            <div class="flex flex-wrap gap-2 justify-center max-w-md mb-6">
+              ${['iPhone', 'Samsung', 'Sony', 'boAt', 'Watch', 'Sneakers', 'Laptop'].map(tag => `
+                <button data-quick-search-tag="${tag}" class="px-3.5 py-1.5 rounded-full bg-surface-container-low hover:bg-primary hover:text-on-primary text-primary font-label-sm text-xs font-semibold border border-primary/20 transition-all cursor-pointer">
+                  ${tag}
+                </button>
+              `).join('')}
+            </div>
+            <button id="reset-search-btn" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-sm font-bold shadow-md cursor-pointer hover:bg-primary-container transition-all">
+              ${isTamil ? 'அனைத்து பொருட்களையும் மீட்டமை' : 'Reset Search'}
+            </button>
+          </div>
+        ` : `
+          <!-- Product Grid -->
 
         <!-- Product Grid (Responsive: 2 cols on mobile, 4 on desktop) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -214,6 +269,7 @@ export function renderHomeView(container) {
             `;
           }).join('')}
         </div>
+        `}
       </section>
 
       <!-- Featured Brands Carousel -->
@@ -231,7 +287,7 @@ export function renderHomeView(container) {
             ${['Apple', 'Samsung', 'Sony', 'boAt', 'Dell', 'HP', 'Anker', 'OnePlus'].map(brand => `
               <button 
                 data-search-brand="${brand}"
-                class="px-4 py-2 rounded-xl bg-surface-container-lowest hover:bg-surface-container shadow-xs text-on-surface font-label-md text-label-md font-bold shrink-0 flex items-center gap-2 border border-surface-container transition-all active:scale-95"
+                class="px-4 py-2 rounded-xl bg-surface-container-lowest hover:bg-surface-container shadow-xs text-on-surface font-label-md text-label-md font-bold shrink-0 flex items-center gap-2 border border-surface-container transition-all active:scale-95 cursor-pointer"
               >
                 <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
                 <span>${brand}</span>
@@ -245,6 +301,23 @@ export function renderHomeView(container) {
   `;
 
   // Attach Event Listeners
+  const clearSearchBtn = container.querySelector('#clear-search-filter-btn');
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => store.clearSearch());
+  }
+
+  const resetSearchBtn = container.querySelector('#reset-search-btn');
+  if (resetSearchBtn) {
+    resetSearchBtn.addEventListener('click', () => store.clearSearch());
+  }
+
+  container.querySelectorAll('[data-quick-search-tag]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-quick-search-tag');
+      store.setSearch(tag);
+    });
+  });
+
   const claimBtn = container.querySelector('#claim-bank-offer-btn');
   if (claimBtn) {
     claimBtn.addEventListener('click', () => {
