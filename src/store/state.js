@@ -264,6 +264,36 @@ class Store {
     this.setView('orders');
     this.showToast(`Order #${newOrder.id} placed successfully!`, 'success');
     this.notify();
+
+    // Async sync with MySQL backend if running
+    try {
+      fetch('http://localhost:8000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: (newOrder.item ? [{
+            product_id: 'prod-1',
+            product_name: newOrder.item.name,
+            product_image: newOrder.item.image,
+            color: newOrder.item.color || 'Default',
+            quantity: newOrder.item.quantity || 1,
+            price: newOrder.item.price
+          }] : []),
+          total_amount: newOrder.item ? newOrder.item.price : 0,
+          delivery_address: deliveryAddress,
+          payment_method: paymentMethod,
+          user_id: 'usr-1'
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.order_id) {
+          console.log('[MySQL] Order recorded in porulagam_db:', data.order_id);
+        }
+      })
+      .catch(() => {});
+    } catch (_) {}
+
     return newOrder;
   }
 

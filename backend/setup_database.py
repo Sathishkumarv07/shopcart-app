@@ -4,24 +4,40 @@ Creates porulagam_db in MySQL Server and seeds all catalog tables.
 """
 import pymysql
 import json
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env
+env_file = Path(__file__).parent / ".env"
+if env_file.exists():
+    load_dotenv(dotenv_path=env_file)
+else:
+    load_dotenv()
+
+DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PORT = int(os.getenv('DB_PORT', '3306'))
+DB_USER = os.getenv('DB_USER', 'root')
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'sathish')
+DB_NAME = os.getenv('DB_NAME', 'porulagam_db')
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'sathish',
-    'port': 3306,
+    'host': DB_HOST,
+    'user': DB_USER,
+    'password': DB_PASSWORD,
+    'port': DB_PORT,
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor
 }
 
 def setup_database():
-    print("Connecting to MySQL server at localhost:3306...")
+    print(f"Connecting to MySQL server at {DB_HOST}:{DB_PORT} as '{DB_USER}'...")
     conn = pymysql.connect(**DB_CONFIG)
     try:
         with conn.cursor() as cursor:
-            print("Creating database 'porulagam_db' if not exists...")
-            cursor.execute("CREATE DATABASE IF NOT EXISTS porulagam_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
-            cursor.execute("USE porulagam_db;")
+            print(f"Creating database '{DB_NAME}' if not exists...")
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+            cursor.execute(f"USE `{DB_NAME}`;")
 
             print("Creating tables...")
             # 1. Categories

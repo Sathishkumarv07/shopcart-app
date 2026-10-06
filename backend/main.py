@@ -6,9 +6,19 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+from pathlib import Path
+from dotenv import load_dotenv
 import pymysql
 import json
 import random
+import os
+
+# Load environment variables from .env file
+env_file = Path(__file__).parent / ".env"
+if env_file.exists():
+    load_dotenv(dotenv_path=env_file)
+else:
+    load_dotenv()
 
 app = FastAPI(
     title="Porulagam Marketplace API",
@@ -26,17 +36,23 @@ app.add_middleware(
 )
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'sathish',
-    'database': 'porulagam_db',
-    'port': 3306,
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', 'sathish'),
+    'database': os.getenv('DB_NAME', 'porulagam_db'),
+    'port': int(os.getenv('DB_PORT', '3306')),
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor
 }
 
 def get_db():
-    return pymysql.connect(**DB_CONFIG)
+    try:
+        return pymysql.connect(**DB_CONFIG)
+    except pymysql.MySQLError as err:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Database connection error: {str(err)}"
+        )
 
 # Pydantic Schemas
 class OrderItemCreate(BaseModel):
@@ -67,9 +83,44 @@ def root():
     return {
         "status": "online",
         "app": "Porulagam (பொருளகம்) Marketplace API",
-        "database": "MySQL (porulagam_db)",
+        "database": f"MySQL ({DB_CONFIG['database']} @ {DB_CONFIG['host']}:{DB_CONFIG['port']})",
         "version": "1.0.0"
     }
+
+@app.get("/api/health")
+def health_check():
+    try:
+        conn = get_db()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT VERSION() AS version;")
+            ver = cursor.fetchone()
+            cursor.execute("SELECT COUNT(*) AS count FROM products;")
+            products_count = cursor.fetchone()['count']
+            cursor.execute("SELECT COUNT(*) AS count FROM categories;")
+            categories_count = cursor.fetchone()['count']
+            cursor.execute("SELECT COUNT(*) AS count FROM orders;")
+            orders_count = cursor.fetchone()['count']
+        conn.close()
+        return {
+            "status": "healthy",
+            "database": "MySQL",
+            "database_name": DB_CONFIG['database'],
+            "mysql_host": DB_CONFIG['host'],
+            "mysql_port": DB_CONFIG['port'],
+            "mysql_version": ver['version'],
+            "counts": {
+                "products": products_count,
+                "categories": categories_count,
+                "orders": orders_count
+            }
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "MySQL",
+            "database_name": DB_CONFIG['database'],
+            "error": str(e)
+        }
 
 @app.get("/api/categories")
 def get_categories():
@@ -361,4 +412,7 @@ def get_user_profile(user_id: str = "usr-1"):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    host = os.getenv("API_HOST", "0.0.0.0")
+    port = int(os.getenv("API_PORT", "8000"))
+    print(f"Starting Porulagam API on http://{host}:{port}...")
+    uvicorn.run("main:app", host=host, port=port, reload=True)
