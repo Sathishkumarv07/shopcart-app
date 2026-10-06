@@ -20,11 +20,11 @@ if %errorlevel% neq 0 (
 :: Check if server is already running on port 5173
 netstat -ano | findstr :5173 | findstr LISTENING >nul
 if %errorlevel% neq 0 (
-    echo [2/3] Starting Porulagam Web Engine in background...
-    start /min "" cmd /c "npm.cmd run dev"
+    echo [2/3] Starting Porulagam Web Frontend in background...
+    start /min "" cmd /c "cd /d "%~dp0frontend" && npm.cmd run dev"
     timeout /t 2 /nobreak >nul
 ) else (
-    echo [2/3] Porulagam Engine is already running.
+    echo [2/3] Porulagam Frontend Engine is already running.
 )
 
 echo [3/3] Opening Porulagam Desktop Window...
