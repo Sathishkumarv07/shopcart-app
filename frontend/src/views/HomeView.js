@@ -3,6 +3,105 @@ import { store } from '../store/state.js';
 import { products } from '../data/products.js';
 import { categories } from '../data/categories.js';
 
+function renderProductCard(product, isTamil) {
+  const inWishlist = store.isInWishlist(product.id);
+  return `
+    <div class="group rounded-2xl bg-surface-container-lowest border border-surface-container p-3 sm:p-4 shadow-xs hover:shadow-xl hover:border-outline-variant transition-all flex flex-col justify-between relative">
+      
+      <!-- Badges & Wishlist -->
+      <div class="flex items-center justify-between absolute top-4 left-4 right-4 z-10 pointer-events-none">
+        <span class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-[10px] font-bold shadow-xs">
+          ${product.badge || `${product.discountPercent}% OFF`}
+        </span>
+        <button 
+          data-wishlist-toggle="${product.id}"
+          class="w-8 h-8 rounded-full bg-surface-container-lowest/90 backdrop-blur-md shadow-sm flex items-center justify-center text-on-surface-variant hover:text-error active:scale-90 transition-transform pointer-events-auto cursor-pointer"
+          title="Wishlist"
+        >
+          <span 
+            class="material-symbols-outlined text-[18px] ${inWishlist ? 'text-error' : ''}"
+            style="font-variation-settings: 'FILL' ${inWishlist ? 1 : 0};"
+          >
+            favorite
+          </span>
+        </button>
+      </div>
+
+      <!-- Product Image -->
+      <div 
+        data-view-product="${product.id}"
+        class="w-full aspect-square rounded-xl bg-surface-container-low p-4 flex items-center justify-center overflow-hidden cursor-pointer mt-3"
+      >
+        <img 
+          src="${product.mainImage}" 
+          alt="${product.name}" 
+          loading="lazy"
+          class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+
+      <!-- Product Metadata -->
+      <div class="flex flex-col mt-3 flex-1 justify-between">
+        <div>
+          <div class="flex items-center gap-1.5 text-outline text-[11px] font-semibold uppercase tracking-wider">
+            <span>${product.brand}</span>
+            ${product.assured ? `
+              <span class="inline-flex items-center text-primary font-bold">
+                • <span class="material-symbols-outlined text-[12px] ml-0.5">verified</span> Assured
+              </span>
+            ` : ''}
+          </div>
+
+          <h4 
+            data-view-product="${product.id}"
+            class="font-headline-sm text-[13px] sm:text-[14px] text-on-surface font-semibold line-clamp-2 mt-1 cursor-pointer hover:text-primary transition-colors leading-snug"
+            title="${product.name}"
+          >
+            ${product.shortName || product.name}
+          </h4>
+
+          <!-- Star Rating -->
+          <div class="flex items-center gap-1 mt-1.5">
+            <div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-tertiary-container text-on-tertiary-container font-label-sm text-[10px] font-bold">
+              <span>${product.rating}</span>
+              <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
+            </div>
+            <span class="text-[11px] text-outline">(${product.reviewCount.toLocaleString('en-IN')})</span>
+          </div>
+        </div>
+
+        <!-- Price & Add to Cart -->
+        <div class="pt-3 border-t border-surface-container mt-3">
+          <div class="flex items-baseline gap-1.5 mb-2.5">
+            <span class="font-price-md text-price-md text-primary font-extrabold">
+              ₹${product.price.toLocaleString('en-IN')}
+            </span>
+            ${product.originalPrice ? `
+              <span class="font-body-sm text-[11px] text-outline line-through">
+                ₹${product.originalPrice.toLocaleString('en-IN')}
+              </span>
+            ` : ''}
+            ${product.discountPercent > 0 ? `
+              <span class="text-[11px] font-bold text-tertiary">
+                ${product.discountPercent}% off
+              </span>
+            ` : ''}
+          </div>
+
+          <button 
+            data-add-cart="${product.id}"
+            class="w-full py-2 rounded-xl bg-primary-fixed hover:bg-primary text-primary hover:text-on-primary font-label-sm text-label-sm font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-xs cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+            <span>${isTamil ? 'கூடையில் சேர்' : 'Add to Cart'}</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
 export function renderHomeView(container) {
   const state = store.getState();
   const isTamil = state.lang === 'ta';
@@ -21,8 +120,16 @@ export function renderHomeView(container) {
 
   const isSearching = state.searchQuery && state.searchQuery.trim() !== '';
 
+  // Segregate products into curated themed sections
+  const flashDeals = products.filter(p => p.discountPercent >= 20 || p.badge === 'HOT' || p.badge === 'Best Seller').slice(0, 4);
+  const mobiles = products.filter(p => p.category === 'mobiles');
+  const electronics = products.filter(p => p.category === 'electronics').slice(0, 4);
+  const fashion = products.filter(p => p.category === 'fashion');
+  const homeLiving = products.filter(p => p.category === 'home-living' || p.category === 'appliances');
+  const lifestyle = products.filter(p => ['beauty', 'groceries', 'sports', 'books'].includes(p.category));
+
   container.innerHTML = `
-    <div class="flex flex-col w-full pb-10 space-y-4">
+    <div class="flex flex-col w-full pb-10 space-y-6">
       
       ${isSearching ? `
         <!-- Search Results Header Strip -->
@@ -46,6 +153,38 @@ export function renderHomeView(container) {
               <span>${isTamil ? 'அகற்று' : 'Clear Search'}</span>
             </button>
           </div>
+        </section>
+
+        <!-- Search Results Grid -->
+        <section class="px-4 sm:px-6">
+          ${displayProducts.length === 0 ? `
+            <!-- No Results State -->
+            <div class="py-12 px-4 rounded-2xl bg-surface-container-lowest border border-surface-container flex flex-col items-center justify-center text-center">
+              <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline mb-3">
+                <span class="material-symbols-outlined text-[36px]">search_off</span>
+              </div>
+              <h4 class="font-headline-sm text-lg font-bold text-on-surface mb-1">
+                ${isTamil ? 'பொருட்கள் எதுவும் கிடைக்கவில்லை' : 'No products found'}
+              </h4>
+              <p class="font-body-sm text-sm text-on-surface-variant max-w-sm mb-5">
+                ${isTamil ? `"${state.searchQuery}" என்ற தேடலுக்கு முடிவுகள் இல்லை.` : `We couldn't find any products matching "${state.searchQuery}". Try searching for one of the popular tags below:`}
+              </p>
+              <div class="flex flex-wrap gap-2 justify-center max-w-md mb-6">
+                ${['iPhone', 'Samsung', 'Jordan', 'Sony', 'Herman Miller', 'Espresso', 'Dyson'].map(tag => `
+                  <button data-quick-search-tag="${tag}" class="px-3.5 py-1.5 rounded-full bg-surface-container-low hover:bg-primary hover:text-on-primary text-primary font-label-sm text-xs font-semibold border border-primary/20 transition-all cursor-pointer">
+                    ${tag}
+                  </button>
+                `).join('')}
+              </div>
+              <button id="reset-search-btn" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-sm font-bold shadow-md cursor-pointer hover:bg-primary-container transition-all">
+                ${isTamil ? 'அனைத்து பொருட்களையும் மீட்டமை' : 'Reset Search'}
+              </button>
+            </div>
+          ` : `
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              ${displayProducts.map(p => renderProductCard(p, isTamil)).join('')}
+            </div>
+          `}
         </section>
       ` : `
         <!-- Bank / Payment Offers Ticker Strip -->
@@ -92,7 +231,6 @@ export function renderHomeView(container) {
         <!-- Hero Promotional Carousel Banner -->
         <section class="px-4 sm:px-6">
           <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed text-on-primary shadow-lg p-5 sm:p-8">
-            <!-- Glow effects -->
             <div class="absolute -right-8 -top-8 w-44 h-44 bg-inverse-primary/25 rounded-full blur-2xl pointer-events-none"></div>
             <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-secondary-fixed/20 rounded-full blur-xl pointer-events-none"></div>
             
@@ -106,10 +244,10 @@ export function renderHomeView(container) {
                   <span class="text-secondary-fixed font-mono text-[12px] font-bold" id="hero-timer">04h : 22m : 18s</span>
                 </div>
                 <h2 class="font-display-hero text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-                  ${isTamil ? 'மின்னணுவியல் பெருந்தள்ளுபடி' : 'Electronics & Gadgets Mega Drop'}
+                  ${isTamil ? 'மெகா விழாக்கால பெருந்தள்ளுபடி' : 'Festive Season Mega Marketplace'}
                 </h2>
                 <p class="font-body-md text-body-md text-primary-fixed leading-relaxed">
-                  ${isTamil ? 'ஸ்மார்ட்போன்கள் மற்றும் ஹெட்போன்களுக்கு 70% வரை தள்ளுபடி. கூடுதல் எக்ஸ்சேஞ்ச் போனஸ்!' : 'Up to 70% off on flagship smartphones, active noise cancellation buds & M2 iPads.'}
+                  ${isTamil ? 'ஸ்மார்ட்போன்கள், பிரீமியம் லேப்டாப்கள், பிராண்டட் உடைகள் & வீட்டு உபயோக பொருட்களுக்கு 70% வரை தள்ளுபடி!' : 'Up to 70% off on flagship smartphones, Jordans, ergonomic chairs & modern home appliances.'}
                 </p>
                 <div class="flex items-center gap-3 pt-2">
                   <button id="hero-shop-now-btn" class="px-5 py-2.5 rounded-xl bg-white text-primary font-label-md text-label-md font-extrabold hover:bg-surface-container-low transition-all active:scale-95 shadow-md cursor-pointer">
@@ -130,147 +268,146 @@ export function renderHomeView(container) {
             </div>
           </div>
         </section>
-      `}
 
-      <!-- Today's Super Drops / Flash Deals -->
-      <section class="px-4 sm:px-6 pt-2">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-error text-[24px]">local_fire_department</span>
-            <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-              ${isSearching ? (isTamil ? 'பொருந்திய பொருட்கள்' : 'Matching Products') : (isTamil ? 'இன்றைய சூப்பர் சலுகைகள்' : "Today's Super Drops")}
-            </h3>
-          </div>
-          ${!isSearching ? `
+        <!-- SECTION 1: Today's Super Drops / Flash Deals -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-error text-[24px]">local_fire_department</span>
+              <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                ${isTamil ? 'இன்றைய சூப்பர் சலுகைகள்' : "Today's Super Drops & Flash Deals"}
+              </h3>
+            </div>
             <button id="view-all-deals-btn" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
-              ${isTamil ? 'அனைத்தும் காண்க' : 'View All'}
+              ${isTamil ? 'அனைத்தும் காண்க' : 'View All Deals'}
               <span class="material-symbols-outlined text-[16px]">chevron_right</span>
             </button>
-          ` : ''}
-        </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${flashDeals.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
 
-        ${displayProducts.length === 0 ? `
-          <!-- No Results State -->
-          <div class="py-12 px-4 rounded-2xl bg-surface-container-lowest border border-surface-container flex flex-col items-center justify-center text-center">
-            <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline mb-3">
-              <span class="material-symbols-outlined text-[36px]">search_off</span>
+        <!-- SECTION 2: Flagship Smartphones & 5G Mobiles -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[24px]">smartphone</span>
+              <div>
+                <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                  ${isTamil ? 'முன்னணி 5G ஸ்மார்ட்போன்கள்' : 'Flagship 5G Smartphones'}
+                </h3>
+                <p class="font-body-sm text-[12px] text-on-surface-variant hidden sm:block">
+                  ${isTamil ? 'ஆப்பிள், சாம்சங், ஒன்பிளஸ் & கூகிள் பிக்சல் கைபேசிகள்' : 'Apple iPhone 16 Pro, Samsung S24 Ultra, OnePlus 12 & Pixel 9 Pro'}
+                </p>
+              </div>
             </div>
-            <h4 class="font-headline-sm text-lg font-bold text-on-surface mb-1">
-              ${isTamil ? 'பொருட்கள் எதுவும் கிடைக்கவில்லை' : 'No products found'}
-            </h4>
-            <p class="font-body-sm text-sm text-on-surface-variant max-w-sm mb-5">
-              ${isTamil ? `"${state.searchQuery}" என்ற தேடலுக்கு முடிவுகள் இல்லை. கீழே உள்ள பரிந்துரைகளைப் பார்க்கவும்.` : `We couldn't find any products matching "${state.searchQuery}". Try searching for one of the popular categories below:`}
-            </p>
-            <div class="flex flex-wrap gap-2 justify-center max-w-md mb-6">
-              ${['iPhone', 'Samsung', 'Sony', 'boAt', 'Watch', 'Sneakers', 'Laptop'].map(tag => `
-                <button data-quick-search-tag="${tag}" class="px-3.5 py-1.5 rounded-full bg-surface-container-low hover:bg-primary hover:text-on-primary text-primary font-label-sm text-xs font-semibold border border-primary/20 transition-all cursor-pointer">
-                  ${tag}
-                </button>
-              `).join('')}
-            </div>
-            <button id="reset-search-btn" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-sm font-bold shadow-md cursor-pointer hover:bg-primary-container transition-all">
-              ${isTamil ? 'அனைத்து பொருட்களையும் மீட்டமை' : 'Reset Search'}
+            <button data-cat-nav="mobiles" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'மொபைல்கள் காண்க' : 'Explore Mobiles'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
             </button>
           </div>
-        ` : `
-          <!-- Product Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${mobiles.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
 
-        <!-- Product Grid (Responsive: 2 cols on mobile, 4 on desktop) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-          ${displayProducts.map(product => {
-            const inWishlist = store.isInWishlist(product.id);
-            return `
-              <div class="group rounded-2xl bg-surface-container-lowest border border-surface-container p-3 sm:p-4 shadow-xs hover:shadow-xl hover:border-outline-variant transition-all flex flex-col justify-between relative">
-                
-                <!-- Badges & Wishlist -->
-                <div class="flex items-center justify-between absolute top-4 left-4 right-4 z-10 pointer-events-none">
-                  <span class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-[10px] font-bold shadow-xs">
-                    ${product.badge || `${product.discountPercent}% OFF`}
-                  </span>
-                  <button 
-                    data-wishlist-toggle="${product.id}"
-                    class="w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md shadow-sm flex items-center justify-center text-on-surface-variant hover:text-error active:scale-90 transition-transform pointer-events-auto"
-                    title="Wishlist"
-                  >
-                    <span 
-                      class="material-symbols-outlined text-[18px] ${inWishlist ? 'text-error' : ''}"
-                      style="font-variation-settings: 'FILL' ${inWishlist ? 1 : 0};"
-                    >
-                      favorite
-                    </span>
-                  </button>
-                </div>
-
-                <!-- Product Image -->
-                <div 
-                  data-view-product="${product.id}"
-                  class="w-full aspect-square rounded-xl bg-surface-container-low p-4 flex items-center justify-center overflow-hidden cursor-pointer mt-3"
-                >
-                  <img 
-                    src="${product.mainImage}" 
-                    alt="${product.name}" 
-                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                <!-- Product Metadata -->
-                <div class="flex flex-col mt-3 flex-1 justify-between">
-                  <div>
-                    <div class="flex items-center gap-1.5 text-outline text-[11px] font-semibold uppercase tracking-wider">
-                      <span>${product.brand}</span>
-                      ${product.assured ? `
-                        <span class="inline-flex items-center text-primary font-bold">
-                          • <span class="material-symbols-outlined text-[12px] ml-0.5">verified</span> Assured
-                        </span>
-                      ` : ''}
-                    </div>
-
-                    <h4 
-                      data-view-product="${product.id}"
-                      class="font-headline-sm text-[13px] sm:text-[14px] text-on-surface font-semibold line-clamp-2 mt-1 cursor-pointer hover:text-primary transition-colors leading-snug"
-                    >
-                      ${product.shortName || product.name}
-                    </h4>
-
-                    <!-- Star Rating -->
-                    <div class="flex items-center gap-1 mt-1.5">
-                      <div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-tertiary-container text-on-tertiary-container font-label-sm text-[10px] font-bold">
-                        <span>${product.rating}</span>
-                        <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                      </div>
-                      <span class="text-[11px] text-outline">(${product.reviewCount.toLocaleString('en-IN')})</span>
-                    </div>
-                  </div>
-
-                  <!-- Price & Add to Cart -->
-                  <div class="pt-3 border-t border-surface-container mt-3">
-                    <div class="flex items-baseline gap-1.5 mb-2.5">
-                      <span class="font-price-md text-price-md text-primary font-extrabold">
-                        ₹${product.price.toLocaleString('en-IN')}
-                      </span>
-                      ${product.originalPrice ? `
-                        <span class="font-body-sm text-[11px] text-outline line-through">
-                          ₹${product.originalPrice.toLocaleString('en-IN')}
-                        </span>
-                      ` : ''}
-                    </div>
-
-                    <button 
-                      data-add-cart="${product.id}"
-                      class="w-full py-2 rounded-xl bg-primary-fixed hover:bg-primary text-primary hover:text-on-primary font-label-sm text-label-sm font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-xs"
-                    >
-                      <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
-                      <span>${isTamil ? 'கூடையில் சேர்' : 'Add to Cart'}</span>
-                    </button>
-                  </div>
-                </div>
-
+        <!-- SECTION 3: Next-Gen Laptops & Audio -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[24px]">devices</span>
+              <div>
+                <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                  ${isTamil ? 'மின்னணுவியல் & கணினிகள்' : 'Next-Gen Laptops & Tech Audio'}
+                </h3>
+                <p class="font-body-sm text-[12px] text-on-surface-variant hidden sm:block">
+                  ${isTamil ? 'சோனி ANC ஹெட்போன்கள், ஐபேட் ஏர், டெல் லேப்டாப் & ஏர்டேக்' : 'Sony ANC Noise-canceling, M2 iPad Air, Dell XPS OLED & AirTags'}
+                </p>
               </div>
-            `;
-          }).join('')}
-        </div>
-        `}
-      </section>
+            </div>
+            <button data-cat-nav="electronics" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'மின்னணுவியல் காண்க' : 'Explore Electronics'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${electronics.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
+
+        <!-- SECTION 4: Fashion, Footwear & Accessories -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary text-[24px]">checkroom</span>
+              <div>
+                <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                  ${isTamil ? 'ஆடைகள் & பேஷன் டிரெண்ட்ஸ்' : 'Trending Fashion & Footwear'}
+                </h3>
+                <p class="font-body-sm text-[12px] text-on-surface-variant hidden sm:block">
+                  ${isTamil ? 'நைக்கி ஏர் ஜோர்டான், அலன் சோலி சட்டைகள், பாசில் வாட்ச்கள்' : 'Nike Air Jordan 1 OG, Allen Solly Oxford & Fossil Chrono'}
+                </p>
+              </div>
+            </div>
+            <button data-cat-nav="fashion" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'பேஷன் காண்க' : 'Explore Fashion'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${fashion.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
+
+        <!-- SECTION 5: Modern Home, Living & Smart Appliances -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary-container text-[24px]">chair</span>
+              <div>
+                <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                  ${isTamil ? 'வீட்டு உபயோகம் & மின்சாதனங்கள்' : 'Modern Home, Living & Appliances'}
+                </h3>
+                <p class="font-body-sm text-[12px] text-on-surface-variant hidden sm:block">
+                  ${isTamil ? 'ஹெர்மன் மில்லர் நாற்காலிகள், எஸ்பிரெஸ்ஸோ மெஷின் & எல்ஜி OLED டிவி' : 'Herman Miller Aeron, Espresso makers, Hue Lights & LG OLED C4'}
+                </p>
+              </div>
+            </div>
+            <button data-cat-nav="home-living" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'வீட்டுப் பொருட்கள் காண்க' : 'Explore Home'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${homeLiving.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
+
+        <!-- SECTION 6: Beauty, Wellness, Groceries & Books -->
+        <section class="px-4 sm:px-6">
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-error text-[24px]">spa</span>
+              <div>
+                <h3 class="font-headline-sm text-lg sm:text-xl text-on-surface font-bold">
+                  ${isTamil ? 'அழகு, மளிகை & புத்தகங்கள்' : 'Beauty, Wellness & Heritage Books'}
+                </h3>
+                <p class="font-body-sm text-[12px] text-on-surface-variant hidden sm:block">
+                  ${isTamil ? 'மினிமலிஸ்ட் சீரம், ப்ளூ டோகை காபி & பொன்னியின் செல்வன்' : 'Minimalist Serums, Blue Tokai Coffee, Ponniyin Selvan & Garmin'}
+                </p>
+              </div>
+            </div>
+            <button data-cat-nav="beauty" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-0.5 cursor-pointer">
+              ${isTamil ? 'அனைத்தும் காண்க' : 'Explore All'}
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            ${lifestyle.map(p => renderProductCard(p, isTamil)).join('')}
+          </div>
+        </section>
+      `}
 
       <!-- Featured Brands Carousel -->
       <section class="px-4 sm:px-6 pt-4">
@@ -284,7 +421,7 @@ export function renderHomeView(container) {
             </span>
           </div>
           <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
-            ${['Apple', 'Samsung', 'Sony', 'boAt', 'Dell', 'HP', 'Anker', 'OnePlus'].map(brand => `
+            ${['Apple', 'Samsung', 'Sony', 'Nike', 'Herman Miller', 'boAt', 'Dell', 'Dyson', 'Fossil', 'Ray-Ban'].map(brand => `
               <button 
                 data-search-brand="${brand}"
                 class="px-4 py-2 rounded-xl bg-surface-container-lowest hover:bg-surface-container shadow-xs text-on-surface font-label-md text-label-md font-bold shrink-0 flex items-center gap-2 border border-surface-container transition-all active:scale-95 cursor-pointer"
