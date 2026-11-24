@@ -67,31 +67,47 @@ class DealsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Coupons
-            Text(isTamil ? 'கூப்பன்கள்' : 'Exclusive Coupons', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            // Offer Sale Coupons
+            Text(isTamil ? 'ஆஃபர் விற்பனை கூப்பன்கள்' : 'Offer Sale Exclusive Coupons', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCouponCard(
-                    context,
-                    provider,
-                    'PORULAGAM10',
-                    'Flat 10% Off',
-                    'Min ₹2,999 on Electronics',
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 220,
+                    child: _buildCouponCard(
+                      context,
+                      provider,
+                      'MEGAOFFER70',
+                      'Flat ₹700 Off',
+                      'Grand Sale min ₹2,499',
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildCouponCard(
-                    context,
-                    provider,
-                    'WELCOME500',
-                    'Flat ₹500 Off',
-                    'Applicable on first order',
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 220,
+                    child: _buildCouponCard(
+                      context,
+                      provider,
+                      'PORULAGAM10',
+                      'Flat 10% Off',
+                      'Min ₹2,999 on Electronics',
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 220,
+                    child: _buildCouponCard(
+                      context,
+                      provider,
+                      'WELCOME500',
+                      'Flat ₹500 Off',
+                      'Applicable on first order',
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 

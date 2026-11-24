@@ -230,39 +230,43 @@ export function renderHomeView(container) {
 
         <!-- Hero Promotional Carousel Banner -->
         <section class="px-4 sm:px-6">
-          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed text-on-primary shadow-lg p-5 sm:p-8">
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed text-on-primary shadow-xl p-5 sm:p-8">
             <div class="absolute -right-8 -top-8 w-44 h-44 bg-inverse-primary/25 rounded-full blur-2xl pointer-events-none"></div>
             <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-secondary-fixed/20 rounded-full blur-xl pointer-events-none"></div>
             
             <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div class="flex flex-col gap-2 max-w-lg">
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-0.5 rounded-full bg-on-primary/20 backdrop-blur-md text-on-primary font-label-sm text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-ping"></span>
-                    ${isTamil ? 'வரையறுக்கப்பட்ட சலுகை' : 'Limited Time Super Drop'}
+                  <span class="px-3 py-1 rounded-full bg-on-primary/20 backdrop-blur-md text-on-primary font-label-sm text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+                    <span class="w-2 h-2 rounded-full bg-secondary-fixed animate-ping"></span>
+                    ${isTamil ? 'மெகா ஆஃபர் விற்பனை நேரலை' : 'Mega Offer Sale Live'}
                   </span>
                   <span class="text-secondary-fixed font-mono text-[12px] font-bold" id="hero-timer">04h : 22m : 18s</span>
                 </div>
                 <h2 class="font-display-hero text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-                  ${isTamil ? 'மெகா விழாக்கால பெருந்தள்ளுபடி' : 'Festive Season Mega Marketplace'}
+                  ${isTamil ? 'மெகா விழாக்கால பெருந்தள்ளுபடி விற்பனை' : 'Grand Festival Mega Offer Sale'}
                 </h2>
                 <p class="font-body-md text-body-md text-primary-fixed leading-relaxed">
-                  ${isTamil ? 'ஸ்மார்ட்போன்கள், பிரீமியம் லேப்டாப்கள், பிராண்டட் உடைகள் & வீட்டு உபயோக பொருட்களுக்கு 70% வரை தள்ளுபடி!' : 'Up to 70% off on flagship smartphones, Jordans, ergonomic chairs & modern home appliances.'}
+                  ${isTamil ? 'ஸ்மார்ட்போன்கள், பிரீமியம் லேப்டாப்கள், பிராண்டட் உடைகள் & வீட்டு உபயோக பொருட்களுக்கு 80% வரை அதிரடி தள்ளுபடி!' : 'Up to 80% off on flagship smartphones, Jordans, smart audio & modern appliances with extra bank cashback.'}
                 </p>
-                <div class="flex items-center gap-3 pt-2">
-                  <button id="hero-shop-now-btn" class="px-5 py-2.5 rounded-xl bg-white text-primary font-label-md text-label-md font-extrabold hover:bg-surface-container-low transition-all active:scale-95 shadow-md cursor-pointer">
-                    ${isTamil ? 'இப்போதே வாங்குங்கள்' : 'Shop Flagships'}
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                  <button id="hero-shop-now-btn" class="px-5 py-2.5 rounded-xl bg-white text-primary font-label-md text-label-md font-extrabold hover:bg-surface-container-low transition-all active:scale-95 shadow-md cursor-pointer flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[18px]">local_mall</span>
+                    <span>${isTamil ? 'சலுகைகளை வாங்குக' : 'Shop Offer Sales'}</span>
                   </button>
-                  <span class="font-label-sm text-[12px] text-white/80">No Cost EMI from ₹1,499/mo</span>
+                  <button id="hero-view-coupons-btn" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-label-md text-label-md font-bold transition-all border border-white/20 cursor-pointer flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[18px]">sell</span>
+                    <span>${isTamil ? 'கூப்பன்கள்' : 'Claim ₹700 Off'}</span>
+                  </button>
                 </div>
               </div>
 
               <!-- Hero graphic / badge -->
               <div class="relative shrink-0 hidden sm:flex items-center justify-center">
-                <div class="w-32 h-32 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-3 flex flex-col items-center justify-center text-center shadow-inner">
-                  <span class="material-symbols-outlined text-[42px] text-secondary-fixed">bolt</span>
-                  <span class="font-price-lg text-xl font-black text-white mt-1">UP TO 70%</span>
-                  <span class="font-label-sm text-[10px] uppercase text-white/90 font-bold">DISCOUNT</span>
+                <div class="w-36 h-36 rounded-2xl bg-white/10 backdrop-blur-md border border-white/25 p-3 flex flex-col items-center justify-center text-center shadow-xl">
+                  <span class="material-symbols-outlined text-[44px] text-secondary-fixed">sell</span>
+                  <span class="font-price-lg text-2xl font-black text-white mt-0.5">80% OFF</span>
+                  <span class="font-label-sm text-[10px] uppercase text-white/95 font-bold tracking-wider">OFFER SALE</span>
                 </div>
               </div>
             </div>
@@ -465,7 +469,18 @@ export function renderHomeView(container) {
 
   const shopNowBtn = container.querySelector('#hero-shop-now-btn');
   if (shopNowBtn) {
-    shopNowBtn.addEventListener('click', () => store.setView('deals'));
+    shopNowBtn.addEventListener('click', () => {
+      state.dealFilter = 'offersale';
+      store.setView('deals');
+    });
+  }
+
+  const heroCouponsBtn = container.querySelector('#hero-view-coupons-btn');
+  if (heroCouponsBtn) {
+    heroCouponsBtn.addEventListener('click', () => {
+      store.applyCoupon('MEGAOFFER70');
+      store.openModal('cart');
+    });
   }
 
   const viewAllDealsBtn = container.querySelector('#view-all-deals-btn');

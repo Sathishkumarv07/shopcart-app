@@ -29,20 +29,65 @@ class MainScreen extends StatelessWidget {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
-                color: const Color(0xFF0039B1),
-                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF002D8C), Color(0xFF1E50D8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x330039B1),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.shopping_bag, color: Colors.white, size: 20),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 18),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFB703),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'பொருளகம்',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Color(0xFF0039B1), height: 1.1),
+                Row(
+                  children: [
+                    const Text(
+                      'பொருளகம்',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Color(0xFF0039B1), height: 1.1),
+                    ),
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE6F4EA),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'SALE',
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF006C49)),
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   provider.pincode,

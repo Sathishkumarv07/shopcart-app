@@ -21,14 +21,19 @@ export function renderHeader(container) {
         <div class="flex items-center justify-between gap-2 sm:gap-4 h-12">
           <!-- Logo & Location Badge -->
           <div class="flex items-center gap-2 sm:gap-4">
-            <button id="header-logo-btn" class="flex items-center gap-2 group focus:outline-none transition-transform active:scale-95 cursor-pointer" aria-label="Go to Home">
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm shadow-primary/30 group-hover:bg-primary-container transition-colors">
-                <span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+            <button id="header-logo-btn" class="flex items-center gap-2.5 group focus:outline-none transition-transform active:scale-95 cursor-pointer" aria-label="Go to Home">
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-sm shadow-primary/30 group-hover:shadow-md group-hover:scale-105 transition-all flex items-center justify-center bg-primary">
+                <img src="/logo.svg" alt="Porulagam Logo" class="w-full h-full object-cover" />
               </div>
               <div class="flex flex-col text-left">
-                <span class="font-display-hero text-xl sm:text-2xl font-black text-primary tracking-tight leading-none">
-                  பொருளகம்
-                </span>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-display-hero text-xl sm:text-2xl font-black text-primary tracking-tight leading-none">
+                    பொருளகம்
+                  </span>
+                  <span class="hidden sm:inline-flex px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-tertiary-container text-on-tertiary-container tracking-wider uppercase">
+                    ${isTamil ? 'சலுகைகள்' : 'SALE'}
+                  </span>
+                </div>
                 <span class="font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant font-semibold tracking-wider uppercase -mt-0.5">
                   Porulagam
                 </span>

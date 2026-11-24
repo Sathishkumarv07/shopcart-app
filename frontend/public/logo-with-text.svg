@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002D8C"/>
+      <stop offset="100%" stop-color="#1E50D8"/>
+    </linearGradient>
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFB703"/>
+      <stop offset="100%" stop-color="#FB8500"/>
+    </linearGradient>
+    <linearGradient id="logoEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#00A86B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon Section -->
+  <g transform="translate(4, 4)">
+    <rect width="56" height="56" rx="14" fill="url(#logoBgGrad)"/>
+    <!-- Bag Handle -->
+    <path d="M 20 20 C 20 10, 36 10, 36 20" fill="none" stroke="url(#logoGold)" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Bag Body -->
+    <path d="M 13 20 C 13 18, 14 17, 16 17 L 40 17 C 42 17, 43 18, 43 20 L 46 45 C 46 48, 44 50, 41 50 L 15 50 C 12 50, 10 48, 10 45 Z" fill="#FFFFFF"/>
+    <!-- Emblem -->
+    <circle cx="28" cy="34" r="9" fill="url(#logoGold)"/>
+    <circle cx="28" cy="34" r="7" fill="#0039B1"/>
+    <!-- P / Star -->
+    <path d="M 25 30 L 29 30 C 31 30, 32 31, 32 33 C 32 35, 31 36, 29 36 L 27 36 L 27 38 L 25 38 Z" fill="url(#logoGold)"/>
+    <!-- Offer Tag -->
+    <rect x="40" y="16" width="12" height="7" rx="2" fill="url(#logoEmerald)"/>
+    <text x="46" y="22" font-family="'Inter', sans-serif" font-size="5" font-weight="900" fill="#FFFFFF" text-anchor="middle">%</text>
+  </g>
+
+  <!-- Typography Section -->
+  <g transform="translate(70, 0)">
+    <text x="0" y="32" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="24" fill="#0039B1" letter-spacing="-0.5">பொருளகம்</text>
+    <text x="0" y="48" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="11" fill="#434654" letter-spacing="1.5">PORULAGAM</text>
+    <!-- Mega Offer Badge -->
+    <rect x="86" y="37" width="76" height="15" rx="7.5" fill="#E6F4EA"/>
+    <text x="124" y="48" font-family="'Inter', sans-serif" font-weight="800" font-size="8.5" fill="#006C49" text-anchor="middle">OFFER SALES</text>
+  </g>
+</svg>
