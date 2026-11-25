@@ -1,6 +1,20 @@
-# Porulagam (பொருளகம்) Marketplace Platform
+# பொருளகம் (Porulagam) - Online Marketplace Web Platform
 
-Full-stack e-commerce marketplace platform with separated frontend and backend services.
+**பொருளகம் (Porulagam)** is a modern, high-velocity e-commerce marketplace web application built with a responsive Single Page Application (SPA) frontend, backed by a high-performance **Python FastAPI** service and a **MySQL** database (`porulagam_db`).
+
+---
+
+## 🏗️ Architecture
+
+```
+Web Browser (Desktop & Mobile Responsive)
+       │ HTTP / REST API
+       ▼
+Python FastAPI Backend (http://localhost:8000)
+       │ SQL Queries (PyMySQL)
+       ▼
+MySQL 8.0 Database (porulagam_db on localhost:3306)
+```
 
 ---
 
@@ -16,48 +30,69 @@ porundhagam/
 │   ├── start_backend.bat         # Backend launcher script
 │   └── requirements.txt          # Python dependencies
 │
-├── frontend/                      # Web Application (Vite + JavaScript)
-│   ├── src/                      # Components, Views, Reactive Store, Styles
-│   ├── public/                   # Static assets & web manifest
+├── frontend/                      # Web Application (Vite + Modern JavaScript + Tailwind)
+│   ├── src/
+│   │   ├── components/           # Header, BottomNav, Modals, Toast, CartDrawer
+│   │   ├── data/                 # Products, Categories, Deals, Orders catalog
+│   │   ├── store/                # Reactive state management (Cart, Wishlist, Language)
+│   │   ├── views/                # HomeView, DealsView, CategoriesView, OrdersView, AccountView
+│   │   ├── main.js               # Web app entry point & router
+│   │   └── style.css             # Tailwind & typography styles
+│   ├── public/                   # SVGs (logo, logo-with-text) & web manifest
 │   ├── index.html                # Single-page application entry HTML
 │   ├── vite.config.js            # Vite build configuration
 │   ├── start_frontend.bat        # Frontend launcher script
 │   └── package.json              # Node dependencies
 │
-├── porulagam_app/                 # Mobile Application (Flutter)
-│   └── lib/                      # Flutter UI screens, providers & API client
-│
-├── stitch_shopkart_marketplace_platform/  # UI designs & screen specs
-│
-└── Launch-Porulagam-Desktop.bat   # Unified desktop launcher (Starts Backend + Frontend)
+└── Launch-Porulagam-Desktop.bat   # Unified site launcher (Starts Backend + Frontend + Opens Browser)
 ```
 
 ---
 
-## 🚀 Running the Project
+## 🌐 Web Platform Features
 
-### 1. Unified Launcher (Recommended)
+1. **Material 3 Design & Responsive Web Layout**:
+   - Seamlessly responsive on **Desktop**, **Tablet**, and **Mobile browsers**.
+   - Custom branding with Electric Royal Blue (`#0039B1`), Emerald Green (`#006C49`), and Amber Gold accents.
+   - Custom vector branding ([logo.svg](frontend/public/logo.svg) & [logo-with-text.svg](frontend/public/logo-with-text.svg)).
+
+2. **Core Pages & Views**:
+   - **Home (முகப்பு)**: Bank ticker, category explorer, countdown hero promotional banner, Super Drops grid, official brand chips.
+   - **Categories (பிரிவுகள்)**: Split-rail category browser with subcategories and brand filtering.
+   - **Offer Sales & Deals (சலுகைகள்)**: Live flash drops countdown, claimable coupons (`MEGAOFFER70`, `PORULAGAM10`, `WELCOME500`), bank offers.
+   - **Orders (ஆர்டர்கள்)**: Status filters (In-Transit, Delivered, Cancelled) with step-by-step parcel tracking.
+   - **Account (கணக்கு)**: Profile overview, Porulagam Plus SuperCoins balance, English / தமிழ் bilingual language switch.
+
+3. **Cart, Coupons & Checkout**:
+   - Slide-out Cart Drawer with item quantity steppers (`+`/`-`), coupon code validation, and checkout.
+   - Real-time stock and pricing calculation.
+
+---
+
+## 🚀 How to Run the Website
+
+### Option 1: Unified Launcher (Recommended)
 Double-click **`Launch-Porulagam-Desktop.bat`** from the root folder. It will:
-1. Start the **FastAPI MySQL Backend** on `http://localhost:8000`
+1. Start the **Python FastAPI Backend** on `http://localhost:8000`
 2. Start the **Vite Web Frontend** on `http://localhost:5173`
-3. Open the desktop app window
+3. Launch the web store in your default web browser.
 
 ---
 
-### 2. Running Individually
+### Option 2: Running Services Individually
 
-#### **Backend (`backend/`)**
-```bash
+#### 1. Backend Service (`backend/`)
+```powershell
 cd backend
-python test_db_connection.py   # Verify MySQL connection
-python main.py                 # Start FastAPI server
+python test_db_connection.py   # Test MySQL connectivity
+python main.py                 # Launch FastAPI server
 ```
-- API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
-- Health Check: [http://localhost:8000/api/health](http://localhost:8000/api/health)
+- **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
-#### **Frontend (`frontend/`)**
-```bash
+#### 2. Web Frontend (`frontend/`)
+```powershell
 cd frontend
 npm.cmd run dev                # Start Vite dev server
 ```
-- Web Application: [http://localhost:5173](http://localhost:5173)
+- **Web Storefront**: [http://localhost:5173](http://localhost:5173)
